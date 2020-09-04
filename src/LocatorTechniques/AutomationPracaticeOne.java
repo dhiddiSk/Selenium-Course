@@ -12,24 +12,26 @@ public class AutomationPracaticeOne {
 		WebDriver driver = new ChromeDriver();
 		
 		System.setProperty("webdriver.chrome.driver", "/home/saikrishna/Downloads/chromedriver_linux64/chromedriver");
-		
+			
 		// practice web page from rahulshettu academy
 		
 		driver.get("https://rahulshettyacademy.com/seleniumPractise/#/");
 		
-		//Now search for the search-keyword entry bar.	
+		//Now search products from the search-keyword entry bar, its name starting with br.
+		
 		driver.findElement(By.className("search-keyword")).sendKeys("Brocolli");
 		
-		//driver.navigate().back();
-		
-		//The below line looks for that class name of the button and performs an click action for three times.
+		//add 3kgs of Brocolli
 		
 		int i=0;
 		int BrocolliCost = 0;
 		while(i<3) {
-			driver.findElement(By.className("product-action")).click();
+			
+			driver.findElement(By.xpath("//div[@id='root']/div/div[1]/div/div[1]/div[3]/button")).click();
 			i++;
 			BrocolliCost += 120;
+			
+			
 		}
 		
 		// Now check the cart to verify the number of items were collected and total price calculated for those items.
@@ -45,15 +47,10 @@ public class AutomationPracaticeOne {
 		    //driver.close();
 		}
 		
-		
-		//Now generate a customized xpath for the Apply button and enter the random promo code.
-		
-		
-		//driver.findElement(By.xpath("//*[@id=\'root\']")).sendKeys("PROMO");
-		
-		
-		///driver.findElement(By.className("promoCode")).sendKeys("PROMO");
-		
+
+		//Now generate a customized xpath using text locators and click on place order.
+	
+		driver.findElement(By.cssSelector("#root > div > div > div > div:nth-child(4) > button")).click();
 		
 	
 		
