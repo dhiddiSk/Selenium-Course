@@ -7,7 +7,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 public class AutomationPracaticeOne {
 	
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws InterruptedException{
 		
 		WebDriver driver = new ChromeDriver();
 		
@@ -17,9 +17,15 @@ public class AutomationPracaticeOne {
 		
 		driver.get("https://rahulshettyacademy.com/seleniumPractise/#/");
 		
-		//Now search products from the search-keyword entry bar, its name starting with br.
+		driver.manage().window().maximize();
+		
+		
+		
+		//Now search products from the search-keyword entry bar.
 		
 		driver.findElement(By.className("search-keyword")).sendKeys("Brocolli");
+		
+		
 		
 		//add 3kgs of Brocolli
 		
@@ -38,22 +44,32 @@ public class AutomationPracaticeOne {
 		
 		driver.findElement(By.xpath("//*[@id='root']/div/header/div/div[3]/a[4]/img")).click();
 		
-		if(Integer.parseInt(driver.findElement(By.className("amount")).getText()) == 360){
+		if(Integer.parseInt(driver.findElement(By.className("amount")).getText()) == BrocolliCost){
 			
 			driver.findElement(By.className("action-block")).click();
 		}
 		else {
-		    System.out.println("The computed amount for brocolli is wrong");
+		    
+			System.out.println("The computed amount for brocolli is wrong");
 		    //driver.close();
 		}
 		
-
-		//Now generate a customized xpath using text locators and click on place order.
-	
-		driver.findElement(By.cssSelector("#root > div > div > div > div:nth-child(4) > button")).click();
 		
-	
+		//Enter the promocode
 		
+		Thread.sleep(2000L);
+		
+		driver.findElement(By.xpath("//*[@id='root']/div/div/div/div/div/input")).sendKeys("Promo");
+		
+		
+		
+		//Generate a customized xpath and click on place order.
+	
+		//driver.findElement(By.xpath("//*[@id='root']/div/div/div/div/button")).click();
+		
+		//Generate a customized xpath and click on place order with text
+		
+		driver.findElement(By.xpath("//*[text()='Place Order']")).click();
 		
 		
 		
