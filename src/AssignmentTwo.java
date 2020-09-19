@@ -6,6 +6,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.Select;
 
 public class AssignmentTwo {
 
@@ -31,9 +32,27 @@ public class AssignmentTwo {
 
 		driver.manage().window().maximize();
 
-		Thread.sleep(3000);
+		Select adultPeople = new Select(driver.findElement(By.id("Adults")));
 
-		driver.findElement(By.cssSelector(".ui-state-default.ui-state-highlight.ui-state-active")).click();
+		adultPeople.selectByIndex(2);
+
+		Select children = new Select(driver.findElement(By.id("Childrens")));
+
+		children.selectByIndex(2);
+
+		driver.findElement(By.id("DepartDate")).click();
+
+		Thread.sleep(2000);
+
+		driver.findElement(By.cssSelector(".ui-state-default.ui-state-highlight.ui-state-active ")).click();
+
+		driver.findElement(By.id("MoreOptionsLink")).click();
+
+		driver.findElement(By.id("AirlineAutocomplete")).sendKeys("Indigo");
+
+		driver.findElement(By.id("SearchBtn")).click();
+
+		System.out.println(driver.findElement(By.id("homeErrorMessage")).getText());
 
 	}
 }
