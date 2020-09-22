@@ -6,6 +6,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -15,20 +16,18 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  * 					 3) Enter  source and destination locations
  * 					 4) Enter departure and return date
  * 					 5) Choose the number of travellers, travellers class and then search
- * 					 6) Now choose the latedepartures, non-stop options, then select the flight.
- * 					 7) Now select the flight and book it.
  */
 
 public class MakeMyTripBookingAutomation {
 
 	public static void main(String[] args) throws InterruptedException {
 
+		
 		WebDriver driver = new ChromeDriver();
 
-		// Explicit wait has been choosen in order to make the webdriver only to wait at
-		// certain points
+		// Explicit wait has been choosen in order to make the webdriver only to pause at certain points
 
-		WebDriverWait wait = new WebDriverWait(driver, 5);
+		WebDriverWait wait = new WebDriverWait(driver, 10);
 
 		System.setProperty("webdriver.chrome.driver", "/home/saikrishna/Downloads/chromedriver_linux64/chromedriver");
 
@@ -38,34 +37,38 @@ public class MakeMyTripBookingAutomation {
 
 		driver.manage().deleteAllCookies();
 
-		Thread.sleep(3000);
-
-		// check if the element is present. If there are no elements present then it
-		// must return the empty list.
-
-		boolean elementPresent = driver.findElements(By.xpath("//*[@id=\'SW\']/div[1]/div[1]/ul/li[6]/div[3]"))
-				.size() > 0;
-
-		if (elementPresent) {
-
-			driver.findElement(By.cssSelector("li[data-cy='account']")).click();
-
-		}
-
-		Thread.sleep(5000);
-
-		// Observed certain kind of web adds
-
-		boolean webAddPresent = driver
-				.findElements(By.id("webklipper-publisher-widget-container-notification-container")).size() > 0;
+		// Checking the presence of web-adds and closing it.
+		
+		try {
+			
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("second-img")));
+		
+		
+		boolean webAddPresent = driver.findElements(By.id("second-img")).size() > 0;
 
 		if (webAddPresent) {
 
 			driver.findElement(By.id("webklipper-publisher-widget-container-notification-close-div")).click();
+			
+		  }
+		}
+		
+		catch (Exception e) {
+			System.out.println("No web adds are observed");
+		}
+		
+		
+		boolean loginelementPresentCopy = driver.findElements(By.xpath("//*[@id=\'SW\']/div[1]/div[1]/ul/li[6]/div[3]"))
+				.size() > 0;
+
+		if (loginelementPresentCopy) {
+
+			driver.findElement(By.cssSelector("li[data-cy='account']")).click();
 
 		}
+		
 
-		// Calling to enter details of the passenger
+		// Calling method to enter details of the journey
 
 		journeyPlace(driver, wait);
 
@@ -88,63 +91,41 @@ public class MakeMyTripBookingAutomation {
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("react-autosuggest__section-title")));
 
 		JavascriptExecutor js = (JavascriptExecutor) driver;
-
+		
 		String origin = null;
-		String script = null;
-
-		// script = "return arguments[0].value;\", inputTag";"
 
 		origin = (String) js.executeScript("return arguments[0].value;", from);
 
 		// System.out.println("The value of origin is "+origin);
 
-		int stringPresent = 0;
-
 		while (!origin.contains("Hyderabad")) {
-
-			stringPresent++;
 
 			from.sendKeys(Keys.DOWN);
 
 			origin = (String) js.executeScript("return arguments[0].value;", from);
 
-//		   if(stringPresent>10){
-//			  break; 
-//		   }
-
 		}
-		from.sendKeys(Keys.ENTER);
-
-		//wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[placeholder='To']")));
 		
+		from.sendKeys(Keys.ENTER);
+	
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#react-autowhatever-1")));
 
 		WebElement tocity = driver.findElement(By.cssSelector("input[placeholder='To']"));
 
 		tocity.sendKeys("Bom");
 
-		// wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#react-autowhatever-1")));
-
 		String destination = null;
-		// String script2 = null;
 
 		destination = (String) js.executeScript("return arguments[0].value;", tocity);
 
-		int stringPresent2 = 0;
-
 		while (!destination.contains("Mumbai")) {
-
-			stringPresent2++;
 
 			tocity.sendKeys(Keys.DOWN);
 
 			destination = (String) js.executeScript("return arguments[0].value;", tocity);
-
-//		   if(stringPresent2>10){
-//			  break; 
-//		   }
-
+			
 		}
+		
 		tocity.sendKeys(Keys.ENTER);
 
 		schedule(driver, wait);
@@ -156,32 +137,29 @@ public class MakeMyTripBookingAutomation {
 
 		// Entering departure and return date.
 
-		// driver.findElement(By.id("departure")).click();
+		List<WebElement> departureCalenderWeeks = new ArrayList<WebElement>();
 
-		// get all the elements into a list and iterate through it to select for the
-		// date.
+		List<WebElement> departureDates = new ArrayList<WebElement>();
 
-		List<WebElement> calenderRows = new ArrayList<WebElement>();
+		String departureDateValue = null;
+		
+		WebElement departureMonthFrame = driver.findElement(By.xpath("//div[@class='DayPicker-Months']/div[1]/div[3]"));
 
-		List<WebElement> dates = new ArrayList<WebElement>();
-
-		String dateValue = null;
-
-		calenderRows = driver.findElements(By.xpath("//div[@class='DayPicker-Months']/div[1]/div[3]"));
-
+		departureCalenderWeeks = departureMonthFrame.findElements(By.className("DayPicker-Week"));
+		
 		loop1:
 
-		for (WebElement element : calenderRows) {
+		for (WebElement departureWeek : departureCalenderWeeks) {
 
-			dates = element.findElements(By.cssSelector("div[role='gridcell']"));
+			departureDates = departureWeek.findElements(By.cssSelector("div[role='gridcell']"));
 
-			for (WebElement date : dates) {
+			for (WebElement DepartureDate : departureDates) {
 
-				dateValue = date.getAttribute("aria-label");
+				departureDateValue = DepartureDate.getAttribute("aria-label");
 
-				if (dateValue.contains("sep 23")) {
+				if (departureDateValue.contains("23")) {
 
-					date.click();
+					DepartureDate.click();
 					break loop1;
 				}
 
@@ -189,37 +167,57 @@ public class MakeMyTripBookingAutomation {
 
 		}
 		
-		List<WebElement> calenderRows2 = new ArrayList<WebElement>();
-
-		List<WebElement> dates2 = new ArrayList<WebElement>();
-
-		String dateValue2 = null;
-
-		calenderRows2 = driver.findElements(By.xpath("//div[@class='DayPicker-Months']/div[2]/div[3]"));
 		
+		List<WebElement> returnCalenderWeeks = new ArrayList<WebElement>();
+
+		List<WebElement> returnDates = new ArrayList<WebElement>();
 		
+		String returnDateValue = null;
 		
+		WebElement returnMonthFrame = driver.findElement(By.xpath("//div[@class='DayPicker-Months']/div[2]/div[3]"));
+
+		returnCalenderWeeks = returnMonthFrame.findElements(By.className("DayPicker-Week"));
 		
 		loop2:
 
-			for (WebElement element2 : calenderRows2) {
+		for (WebElement returnWeek : returnCalenderWeeks) {
 
-				dates2 = element2.findElements(By.cssSelector("div[role='gridcell']"));
+			returnDates = returnWeek.findElements(By.cssSelector("div[role='gridcell']"));
 
-				for (WebElement date2 : dates2) {
+			for (WebElement returnDate : returnDates) {
 
-					dateValue2 = date2.getAttribute("aria-label");
+				returnDateValue = returnDate.getAttribute("aria-label");
 
-					if (dateValue2.contains("oct 23")) {
+				if (returnDateValue.contains("23")) {
 
-						date2.click();
-						break loop2;
-					}
-
+					returnDate.click();
+					break loop2;
 				}
 
-			}	
+			}
 
+		}
+		
+		search(driver,wait);
 	}
+	
+	
+	private static void  search(WebDriver driver, WebDriverWait wait){
+		//Number of travellers, memebers, class 
+		
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("label[for='travellers']")));
+		
+		driver.findElement(By.cssSelector("label[for='travellers']")).click();
+		
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("p[data-cy='adultRange']")));
+		
+		driver.findElement(By.cssSelector("li[data-cy='adults-2']")).click();
+		
+		driver.findElement(By.cssSelector("li[data-cy='travellerApplyBtn']")).click();
+		
+		driver.findElement(By.className("primaryBtn.font24.latoBold.widgetSearchBtn.")).click();		
+		
+	}
+	
 
 }
